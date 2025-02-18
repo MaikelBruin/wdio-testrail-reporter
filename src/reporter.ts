@@ -21,11 +21,8 @@ export default class TestRailReporter extends WDIOReporter {
         this.#api = new TestRailAPI(options)
         this.#options = options
         this.runId = ''
-        if (!process.env.WDIO_TESTRAIL_REPORTER_RUN_CREATED) {
-            Promise.resolve(this.#getRunId()).then((value) => this.runId = value)
-            this.interval = setInterval(this.checkForRun, 1000)
-            process.env.WDIO_TESTRAIL_REPORTER_RUN_CREATED = 'true'
-        }
+        Promise.resolve(this.#getRunId()).then((value) => this.runId = value)
+        this.interval = setInterval(this.checkForRun, 1000)
     }
 
     get isSynchronised() {
@@ -101,13 +98,20 @@ export default class TestRailReporter extends WDIOReporter {
     }
 
     #getRunId () {
-        return this.#options.oneReport
-            ? this.#api.getLastTestRun(this.#options.suiteId, this.#options.runName)
-            : this.#api.createTestRun({
+        if (this.#options.oneReport) {
+            if (!process.env.WDIO_TESTRAIL_REPORTER_RUN_CREATED) {
+                process.env.WDIO_TESTRAIL_REPORTER_RUN_CREATED = 'true'
+                return this.#api.getLastTestRun(this.#options.suiteId, this.#options.runName, false)
+            } else {
+                return this.#api.getLastTestRun(this.#options.suiteId, this.#options.runName, true)
+            }
+        } else {
+            return this.#api.createTestRun({
                 suite_id: this.#options.suiteId,
                 name: this.#options.runName,
                 include_all: this.#options.includeAll
             })
+        }
     }
 
     async #updateSuite (suiteStats: SuiteStats) {

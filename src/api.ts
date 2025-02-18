@@ -10,6 +10,7 @@ export default class TestRailAPI {
     #projectId: string
     #baseUrl: string
     #includeAll: boolean
+    #getLatestRunRetries = 0
 
     /**
      *
@@ -95,7 +96,7 @@ export default class TestRailAPI {
         return resp.data.id
     }
 
-    async getLastTestRun (suiteId: string, runName: string) {
+    async getLastTestRun (suiteId: string, runName: string, runExists: boolean) {
         const thirtyMinAgo = new Date()
         thirtyMinAgo.setMinutes(thirtyMinAgo.getMinutes() - 30)
         const date = new Date(thirtyMinAgo)
@@ -110,13 +111,21 @@ export default class TestRailAPI {
                 return run.name!.startsWith(runName)
             })
 
-            const runId = thisrun.length > 0
-                ? thisrun[0].id
-                : await this.createTestRun({
-                    suite_id: suiteId,
-                    name: runName,
-                    include_all: this.#includeAll
-                })
+            let runId
+            if (thisrun.length > 0) {
+                runId = thisrun[0].id
+            } else {
+                if (runExists && this.#getLatestRunRetries < 5) {
+                    this.#getLatestRunRetries++
+                    await this.getLastTestRun(suiteId, runName, runExists)
+                } else {
+                    runId = await this.createTestRun({
+                        suite_id: suiteId,
+                        name: runName,
+                        include_all: this.#includeAll
+                    })
+                }
+            }
 
             return runId
         } catch (err: any) {
