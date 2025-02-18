@@ -1,11 +1,12 @@
 {
   "name": "@wdio/testrail-reporter",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Create a run on testrail and the update the test cases results",
   "author": "Brad DerManouelian",
   "license": "MIT",
   "contributors": [
-    "Christian Bromann <mail@bromann.dev>"
+    "Christian Bromann <mail@bromann.dev>",
+    "Maikel Bruin <maikelbruin@gmail.com>"
   ],
   "main": "./build/cjs/index.js",
   "type": "module",
