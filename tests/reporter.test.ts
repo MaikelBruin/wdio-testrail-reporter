@@ -183,4 +183,11 @@ describe('Multiple CaseID Extraction', () => {
 
         expect(testRailReporter.runId).toEqual('26')
     })
+    test('Should include all elements but first', () => {
+        let args: unknown[] = ['something', 4, false, 'something-else']
+        const eventName = args[0] as string | symbol
+        [, ...args] = args
+        expect(eventName).toEqual('something')
+        expect(args).toEqual([4, false, 'something-else'])
+    })
 })
