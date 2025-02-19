@@ -165,7 +165,9 @@ describe('Multiple CaseID Extraction', () => {
             'string'
         )
     })
-    test('Should use runId if set', () => {
+})
+describe('Updating existing run instead of creating new run(s)', () => {
+    test('Should use existingRunId if set', () => {
         const jsonFileName = './fixtures/FiveMultiPassingTest.json'
         const jsonFilePath = path.join(__dirname, jsonFileName)
         const externalJsonData = JSON.parse(
@@ -183,6 +185,8 @@ describe('Multiple CaseID Extraction', () => {
 
         expect(testRailReporter.runId).toEqual('26')
     })
+})
+describe('Minor code checks', () => {
     test('Should include all elements but first', () => {
         let args: unknown[] = ['something', 4, false, 'something-else']
         const eventName = args[0] as string | symbol
@@ -191,3 +195,4 @@ describe('Multiple CaseID Extraction', () => {
         expect(args).toEqual([4, false, 'something-else'])
     })
 })
+
